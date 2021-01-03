@@ -35,7 +35,7 @@ function App() {
 				sendThrottle('/forward/100');
 				break;
 			case 'KeyS':
-				sendThrottle('/forward/100');
+				sendThrottle('/forward/0');
 				break;
 			case 'KeyA':
 				sendThrottle('/turn/-100');
