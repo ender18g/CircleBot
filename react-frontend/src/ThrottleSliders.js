@@ -7,10 +7,6 @@ function ThrottleSliders({ throttle }) {
 	const LeftHeight = `${200 - LeftPercent / 100 * 200}px`;
 	const RightHeight = `${200 - RightPercent / 100 * 200}px`;
 
-	console.log(throttle.Left);
-	console.log(LeftPercent);
-	console.log(LeftHeight);
-
 	return (
 		<Flex width="200px" justifyContent="space-between">
 			<Box>

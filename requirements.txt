@@ -1,7 +1,17 @@
+Adafruit-Blinka==5.9.2
+adafruit-circuitpython-busdevice==5.0.1
+adafruit-circuitpython-pca9685==3.3.2
+adafruit-circuitpython-register==1.9.1
+Adafruit-GPIO==1.0.3
+Adafruit-PlatformDetect==2.23.0
+Adafruit-PureIO==1.1.8
 click==7.1.2
 Flask==1.1.2
 itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
 paho-mqtt==1.5.1
+pyftdi==0.52.0
+pyserial==3.5
+pyusb==1.1.0
 Werkzeug==1.0.1

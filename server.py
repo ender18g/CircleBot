@@ -9,7 +9,7 @@ running_pi = False
 
 motor_dict = {'LMotor':0,'RMotor':1}
 MAX_THROTTLE=10 #percentage of max power
-MAX_DIFF=10
+MAX_DIFF=5
 FORWARD_PER=0
 DIFF_PER=0
 
@@ -31,14 +31,15 @@ if running_pi:
     pca.channels[v].duty_cycle = 0;
 
 
-def set_throttle():
+def set_throttle(FORWARD_PER,DIFF_PER):
   #forward 0 to 100% and diff -100% (left) to 100%(right)
+  print(f"setting throttle {FORWARD_PER}")
   forward_DC = floor(MAX_THROTTLE/100 * FORWARD_PER/100 * 4095)
   differential_DC = abs(floor(MAX_DIFF/100* DIFF_PER/100*4095)) 
-  if diff>=0: # you want to go right, left needs more
+  if DIFF_PER>=0: # you want to go right, left needs more
     left_DC = forward_DC+differential_DC
     right_DC = forward_DC
-  if diff<0: # you want to go left, right needs more
+  if DIFF_PER<0: # you want to go left, right needs more
     left_DC = forward_DC
     right_DC = forward_DC+differential_DC
   #for a positive differential, L motor moves faster for a right turn
@@ -46,6 +47,7 @@ def set_throttle():
     pca.channels[motor_dict['LMotor']].duty_cycle = left_DC
     pca.channels[motor_dict['RMotor']].duty_cycle = right_DC
   output_dict = {'Left':left_DC,'Right':right_DC}
+  print(output_dict)
   return output_dict
 
 ### Functions to run the bot
@@ -78,7 +80,7 @@ def go_forward(forward=0):
     return json.dumps(output.update({'error':'forward out of range'}))
   ## passed the test, now send to throttle
   FORWARD_PER=forward
-  output = set_throttle()
+  output = set_throttle(FORWARD_PER,DIFF_PER)
   return json.dumps(output)
 
 @app.route('/turn/<differential>')
@@ -91,7 +93,7 @@ def turn(differential=0):
     return json.dumps(output.update({'error':'differential not in range'}))
   ## passed the test, now send to throttle
   DIFF_PER=differential
-  output = set_throttle()
+  output = set_throttle(FORWARD_PER,DIFF_PER)
   return json.dumps(output)
 
 
