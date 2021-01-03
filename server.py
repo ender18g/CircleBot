@@ -8,8 +8,6 @@ app = Flask(__name__,static_folder='react-frontend/build',static_url_path='/')
 running_pi = False
 
 motor_dict = {'LMotor':0,'RMotor':1}
-MAX_THROTTLE=10 #percentage of max power
-MAX_DIFF=5
 FORWARD_PER=0
 DIFF_PER=0
 
@@ -23,7 +21,7 @@ if running_pi:
   # Create a simple PCA9685 class instance.
   pca = PCA9685(i2c_bus)
   # Set the PWM frequency to 60hz.
-  pca.frequency = 1000
+  pca.frequency = 100
   # Set the PWM duty cycle for channel zero to 50%. duty_cycle is 16 bits to match other PWM objects
   # but the PCA9685 will only actually give 12 bits of resolution.
   #max value=4095, lowest = 0
@@ -32,10 +30,11 @@ if running_pi:
 
 
 def set_throttle(FORWARD_PER,DIFF_PER):
+  Max_Hex=0xFFFF
   #forward 0 to 100% and diff -100% (left) to 100%(right)
   print(f"setting throttle {FORWARD_PER}")
-  forward_DC = floor(MAX_THROTTLE/100 * FORWARD_PER/100 * 4095)
-  differential_DC = abs(floor(MAX_DIFF/100* DIFF_PER/100*4095)) 
+  forward_DC = floor(FORWARD_PER/100 * Max_Hex)
+  differential_DC = floor(abs(DIFF_PER/100* Max_Hex))
   if DIFF_PER>=0: # you want to go right, left needs more
     left_DC = forward_DC+differential_DC
     right_DC = forward_DC
@@ -70,30 +69,20 @@ def sensor():
   data=get_mqtt_sensor();
   return data
 
-@app.route('/forward/<forward>')
+@app.route('/throttle/<forward>/<differential>')
 #needs a throttle and diffential between 0 and 100
-def go_forward(forward=0):
+def go_forward(forward,differential):
   forward = int(forward)
+  differential=int(differential)
   ##make sure they are in range, else kill the throttle
   if (forward not in range(101)):
     output = set_throttle(0,0)
     return json.dumps(output.update({'error':'forward out of range'}))
-  ## passed the test, now send to throttle
-  FORWARD_PER=forward
-  output = set_throttle(FORWARD_PER,DIFF_PER)
-  return json.dumps(output)
-
-@app.route('/turn/<differential>')
-#needs a throttle and diffential between 0 and 100
-def turn(differential=0):
-  differential= int(differential)
-  ##make sure they are in range, else kill the throttle
-  if (differential not in range (-100,101)):
+  if (differential not in range(-101,101)):
     output = set_throttle(0,0)
-    return json.dumps(output.update({'error':'differential not in range'}))
+    return json.dumps(output.update({'error':'differential out of range'}))
   ## passed the test, now send to throttle
-  DIFF_PER=differential
-  output = set_throttle(FORWARD_PER,DIFF_PER)
+  output = set_throttle(forward,differential)
   return json.dumps(output)
 
 

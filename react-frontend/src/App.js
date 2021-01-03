@@ -13,6 +13,7 @@ function App() {
 
 	const [ pressedKey, setPressedkey ] = useState('');
 	const [ throttleData, setThrottleData ] = useState({ Left: 0, Right: 0 });
+	const [ command, setCommand ] = useState({ forward: 0, turn: 0 }); //initially, 0 for 0 turn
 
 	const getData = () => {
 		const res = axios.get('/sensor').then((res) => {
@@ -28,29 +29,41 @@ function App() {
 		document.addEventListener('keydown', handleKey);
 	}, []);
 
+	useEffect(
+		() => {
+			console.log(command);
+			sendThrottle(command);
+		},
+		[ command ]
+	);
+
 	const handleKey = (e) => {
 		setPressedkey(e.code);
+		const normForward = 30;
+		const normTurn = 15;
 		switch (e.code) {
 			case 'KeyW':
-				sendThrottle('/forward/100');
-				break;
+				setCommand({ ...command, forward: normForward });
+				return;
 			case 'KeyS':
 				//THIS SHOULD TURN IT OFFF
-				sendThrottle('/forward/0');
-				break;
+				setCommand({ forward: 0, turn: 0 });
+				return;
 			case 'KeyA':
-				sendThrottle('/turn/-100');
-				break;
+				//turn left
+				setCommand({ ...command, turn: -normTurn });
+				return;
 			case 'KeyD':
-				sendThrottle('/turn/100');
-				break;
+				setCommand({ ...command, turn: normTurn });
+				return;
 			default:
-				break;
+				return;
 		}
 	};
 
-	const sendThrottle = (getURL) => {
-		const res = axios.get(getURL).then((res) => {
+	const sendThrottle = () => {
+		console.log(command);
+		const res = axios.get(`/throttle/${command.forward}/${command.turn}`).then((res) => {
 			setThrottleData(res.data);
 		});
 	};

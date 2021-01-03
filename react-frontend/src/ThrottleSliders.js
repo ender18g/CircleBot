@@ -1,8 +1,9 @@
 import { Box, Heading, Flex, Text } from '@chakra-ui/react';
 
 function ThrottleSliders({ throttle }) {
-	const LeftPercent = Math.floor(throttle.Left * 100 / 4096);
-	const RightPercent = Math.floor(throttle.Right * 100 / 4096);
+	const maxHex = 65535;
+	const LeftPercent = Math.floor(throttle.Left * 100 / maxHex);
+	const RightPercent = Math.floor(throttle.Right * 100 / maxHex);
 
 	const LeftHeight = `${200 - LeftPercent / 100 * 200}px`;
 	const RightHeight = `${200 - RightPercent / 100 * 200}px`;
