@@ -3,7 +3,7 @@
 from flask import Flask
 from math import floor
 import json
-app = Flask(__name__)
+app = Flask(__name__,static_folder='react-frontend/build',static_url_path='/')
 
 running_pi = False
 
@@ -58,6 +58,10 @@ def get_mqtt_sensor():
 
 
 ##Flask Functions
+@app.route('/')
+def index():
+  return app.send_static_file('index.html')
+
 
 @app.route('/sensor')
 def sensor():
