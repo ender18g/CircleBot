@@ -30,7 +30,10 @@ def on_message(client, userdata, msg):
   # print( f"{data['euler'][0]}", end='\r')
   save_pickle(data,'sensor.pickle')
   new_data=load_pickle('sensor.pickle')
-  print( f"{new_data.get('euler')[0]}", end='\r')
+  try:  
+    print( f"{new_data.get('euler')[0]}", end='\r')
+  except:
+    print('No data available')
 
   #client.disconnect()
     
