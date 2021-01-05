@@ -1,12 +1,15 @@
 #!/usr/bin/python
 # coding: utf-8
-from flask import Flask, request
+from flask import Flask, Response
 from math import floor
+from importlib import import_module
+import os
+
 
 import json
 app = Flask(__name__,static_folder='react-frontend/build',static_url_path='/')
 
-running_pi = False
+running_pi = True
 
 motor_dict = {'LMotor':0,'RMotor':1}
 FORWARD_PER=0
@@ -33,24 +36,19 @@ if running_pi:
   right_inv = DigitalOutputDevice(21)
 
 #### still on pi, get camera
-
-from camera import VideoCamera
-import time
-import threading
-import os
-pi_camera = VideoCamera(flip=False) # flip pi camera if upside down.
-
-def gen(camera):
-#get camera frame
-  while True:
-    frame = camera.get_frame()
-    yield (b'--frame\r\n'
-            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-@app.route('/video')
-def video_feed():
-  return Response(gen(pi_camera),
-            mimetype='multipart/x-mixed-replace; boundary=frame')
+  from camera_pi import Camera
+  def gen(camera):
+    """Video streaming generator function."""
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+  
+  @app.route('/video_feed')
+  def video_feed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    return Response(gen(Camera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
@@ -126,7 +124,7 @@ def go_forward(forward,differential):
 
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0')
+    app.run(debug=True,host='0.0.0.0',threaded=True)
 
 
     #{"magnetometer": [17.75, -35.875, -13.0625], "calibration": 48, "quaternion": [0.9996948, -0.02008057, 0.01287842, 0.0], "temperature": 28, "timestamp": 738364, "accelerometer": [-0.23, -0.39, 9.44], "gyroscope": [-0.001111111, 0.002222222, 0.0], "linear_acceleration": [0.03, 0.0, -0.34], "euler": [0.0, -1.4375, 2.25]}
