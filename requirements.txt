@@ -12,8 +12,6 @@ itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
 numpy==1.19.4
-opencv-contrib-python==4.5.1.48
-opencv-python==4.5.1.48
 paho-mqtt==1.5.1
 pyftdi==0.52.0
 pyserial==3.5
