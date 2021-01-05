@@ -11,13 +11,25 @@ function ThrottleSliders({ throttle }) {
 	return (
 		<Flex width="200px" justifyContent="space-between">
 			<Box>
-				<Box boxShadow="lg" mx="auto" bg="red.500" width="50px" height="200px">
+				<Box
+					boxShadow="lg"
+					mx="auto"
+					bg={throttle.Diff >= 0 ? 'green.500' : 'red.500'}
+					width="50px"
+					height="200px"
+				>
 					<Box bg="gray.400" width="50px" height={LeftHeight} zIndex="-1" />
 				</Box>
 				<Text fontWeight="600">Left Motor</Text>
 			</Box>
 			<Box>
-				<Box boxShadow="lg" mx="auto" bg="red.500" width="50px" height="200px">
+				<Box
+					boxShadow="lg"
+					mx="auto"
+					bg={throttle.Diff <= 0 ? 'green.500' : 'red.500'}
+					width="50px"
+					height="200px"
+				>
 					<Box bg="gray.400" width="50px" height={RightHeight} zIndex="-1" />
 				</Box>
 				<Text fontWeight="600">Right Motor</Text>

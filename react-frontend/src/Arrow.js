@@ -10,7 +10,7 @@ function Arrow({ rotation }) {
 	return (
 		<Box>
 			<Image boxSize="200px" style={imageStyle} src={rocket} />
-			<Heading mt="15">{rotation}</Heading>
+			<Heading mt="15">{Number.parseFloat(rotation).toFixed(1)}</Heading>
 		</Box>
 	);
 }

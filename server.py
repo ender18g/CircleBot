@@ -22,11 +22,15 @@ if running_pi:
   pca = PCA9685(i2c_bus)
   # Set the PWM frequency to 60hz.
   pca.frequency = 100
-  # Set the PWM duty cycle for channel zero to 50%. duty_cycle is 16 bits to match other PWM objects
-  # but the PCA9685 will only actually give 12 bits of resolution.
-  #max value=4095, lowest = 0
   for k,v in motor_dict.items():
     pca.channels[v].duty_cycle = 0;
+    ### SETUP INV PINS FOR MOTORS
+  from gpiozero import DigitalOutputDevice
+  #https://gpiozero.readthedocs.io/en/stable/recipes.html#pin-numbering
+  #ues pins 38.40 on raspi
+  left_inv = DigitalOutputDevice(20)
+  right_inv = DigitalOutputDevice(21)
+
 
 
 def set_throttle(FORWARD_PER,DIFF_PER):
@@ -35,17 +39,30 @@ def set_throttle(FORWARD_PER,DIFF_PER):
   print(f"setting throttle {FORWARD_PER}")
   forward_DC = floor(FORWARD_PER/100 * Max_Hex)
   differential_DC = floor(abs(DIFF_PER/100* Max_Hex))
-  if DIFF_PER>=0: # you want to go right, left needs more
-    left_DC = forward_DC+differential_DC
-    right_DC = forward_DC
-  if DIFF_PER<0: # you want to go left, right needs more
-    left_DC = forward_DC
-    right_DC = forward_DC+differential_DC
+
+  if DIFF_PER==0:
+    left_DC=forward_DC
+    right_DC=forward_DC
+    if(running_pi):
+      left_inv.off()
+      right_inv.off()
+  elif DIFF_PER>0: # you want to go right, left needs more
+    left_DC = differential_DC
+    right_DC = differential_DC
+    if(running_pi):
+      left_inv.off()
+      right_inv.on()
+  elif DIFF_PER<0: # you want to go left, right needs more
+    left_DC = differential_DC
+    right_DC = differential_DC
+    if(running_pi):
+      left_inv.on()
+      right_inv.off()
   #for a positive differential, L motor moves faster for a right turn
   if (running_pi):
     pca.channels[motor_dict['LMotor']].duty_cycle = left_DC
     pca.channels[motor_dict['RMotor']].duty_cycle = right_DC
-  output_dict = {'Left':left_DC,'Right':right_DC}
+  output_dict = {'Left':left_DC,'Right':right_DC,'Diff':DIFF_PER}
   print(output_dict)
   return output_dict
 
