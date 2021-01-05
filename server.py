@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # coding: utf-8
-from flask import Flask
+from flask import Flask, request
 from math import floor
+
 import json
 app = Flask(__name__,static_folder='react-frontend/build',static_url_path='/')
 
@@ -30,6 +31,26 @@ if running_pi:
   #ues pins 38.40 on raspi
   left_inv = DigitalOutputDevice(20)
   right_inv = DigitalOutputDevice(21)
+
+#### still on pi, get camera
+
+from camera import VideoCamera
+import time
+import threading
+import os
+pi_camera = VideoCamera(flip=False) # flip pi camera if upside down.
+
+def gen(camera):
+#get camera frame
+  while True:
+    frame = camera.get_frame()
+    yield (b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+@app.route('/video')
+def video_feed():
+  return Response(gen(pi_camera),
+            mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
