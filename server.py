@@ -9,7 +9,7 @@ import os
 import json
 app = Flask(__name__,static_folder='react-frontend/build',static_url_path='/')
 
-running_pi = False
+running_pi = True
 
 motor_dict = {'LMotor':0,'RMotor':1}
 FORWARD_PER=0
