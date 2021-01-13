@@ -16,11 +16,11 @@ function App() {
 	const [ throttleData, setThrottleData ] = useState({ Left: 0, Right: 0 });
 	const [ throttleCommand, setThrottleCommand ] = useState({ forward: 0, turn: 0 });
 	//initially, 0 for 0 turn
-	const [ maxThrottle, setMaxThrottle ] = useState({ forward: 30, turn: 15 });
+	const [ maxThrottle, setMaxThrottle ] = useState({ forward: 20, turn: 15 });
 	const [ showVideo, setShowVideo ] = useState(true);
 
 	const getData = () => {
-		const res = axios.get('/sensor').then((res) => {
+		axios.get('/sensor').then((res) => {
 			setSensorData(res.data);
 		});
 	};
@@ -28,10 +28,21 @@ function App() {
 	useEffect(() => {
 		setInterval(() => {
 			getData();
-		}, 50);
-		getData();
-		document.addEventListener('keydown', handleKey);
+		}, 100);
 	}, []);
+
+	useEffect(
+		() => {
+			console.log('SETTING LISTENER', maxThrottle);
+			document.addEventListener('keydown', handleKey);
+
+			return () => {
+				document.removeEventListener('keydown', handleKey);
+				console.log('CLEAN UP!', maxThrottle);
+			};
+		},
+		[ maxThrottle ]
+	);
 
 	useEffect(
 		() => {
@@ -42,11 +53,10 @@ function App() {
 
 	const handleKey = (e) => {
 		setPressedkey(e.code);
-		const normForward = maxThrottle.forward;
-		const normTurn = maxThrottle.turn;
 		switch (e.code) {
 			case 'KeyW':
-				setThrottleCommand({ ...throttleCommand, forward: normForward });
+				console.log('max forward', maxThrottle);
+				setThrottleCommand({ turn: 0, forward: maxThrottle['forward'] });
 				break;
 			case 'KeyS':
 				//THIS SHOULD TURN IT OFFF
@@ -54,10 +64,10 @@ function App() {
 				break;
 			case 'KeyA':
 				//turn left
-				setThrottleCommand({ ...throttleCommand, turn: -normTurn });
+				setThrottleCommand({ ...throttleCommand, turn: -maxThrottle['turn'] });
 				break;
 			case 'KeyD':
-				setThrottleCommand({ ...throttleCommand, turn: normTurn });
+				setThrottleCommand({ ...throttleCommand, turn: maxThrottle['turn'] });
 				break;
 			default:
 				break;
@@ -65,10 +75,17 @@ function App() {
 	};
 
 	const sendThrottle = () => {
-		console.log('sending commandt', throttleCommand);
+		console.log('sending command:', throttleCommand);
+		console.log('max Throttle', maxThrottle);
 		const res = axios.get(`/throttle/${throttleCommand.forward}/${throttleCommand.turn}`).then((res) => {
 			setThrottleData(res.data);
 		});
+	};
+
+	const handleMaxThrottle = (val) => {
+		const newMax = parseInt(val);
+		console.log('new max', newMax);
+		setMaxThrottle({ turn: 15, forward: newMax });
 	};
 
 	return (
@@ -91,7 +108,7 @@ function App() {
 			<Flex mt="10" justify="space-around" flexWrap="wrap" align="center">
 				<Arrow rotation={sensorData.euler[0]} />
 				{showVideo && <Video />}
-				<ThrottleSliders throttle={throttleData} />
+				<ThrottleSliders setMaxThrottle={handleMaxThrottle} maxThrottle={maxThrottle} throttle={throttleData} />
 			</Flex>
 		</Box>
 	);
