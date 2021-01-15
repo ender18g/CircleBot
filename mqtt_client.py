@@ -5,7 +5,7 @@ import ast
 import pickle
 
 
-pickle_file = 'sensorData.pickle'
+pickle_file = 'sensor.pickle'
 
 def save_pickle(data,filename):
   with open(filename,'wb') as f:
@@ -27,18 +27,17 @@ def on_message(client, userdata, msg):
   byte_str = msg.payload
   data = ast.literal_eval(byte_str.decode("UTF-8"))
   #print(data)
-  # print( f"{data['euler'][0]}", end='\r')
-  save_pickle(data,'sensor.pickle')
-  new_data=load_pickle('sensor.pickle')
+  print( f"{data['euler'][0]}", end='\r')
+  save_pickle(data,pickle_file)
   try:  
-    print( f"{new_data.get('euler')[0]}", end='\r')
+    print( f"{data.get('euler')[0]}", end='\r')
   except:
     print('No data available')
 
   #client.disconnect()
     
 client = mqtt.Client()
-client.connect("PiCircleBot",1883,60)
+client.connect("192.168.1.191",1883,60)
 
 client.on_connect = on_connect
 client.on_message = on_message

@@ -9,7 +9,13 @@ import os
 import json
 app = Flask(__name__,static_folder='react-frontend/build',static_url_path='/')
 
-running_pi = True
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-pi",help="declare whether running on raspberry pi 0 or 1",type=int,default=1)
+args=parser.parse_args()
+
+running_pi=args.pi
+print(f"Running Pi: {running_pi}")
 
 motor_dict = {'LMotor':0,'RMotor':1}
 FORWARD_PER=0
@@ -52,7 +58,7 @@ if running_pi:
 
 
 
-def set_throttle(FORWARD_PER,DIFF_PER):
+def set_throttle(FORWARD_PER,DIFF_PER,PID_gains):
   Max_Hex=0xFFFF
   #forward 0 to 100% and diff -100% (left) to 100%(right)
   print(f"setting throttle {FORWARD_PER}")
@@ -81,9 +87,23 @@ def set_throttle(FORWARD_PER,DIFF_PER):
   if (running_pi):
     pca.channels[motor_dict['LMotor']].duty_cycle = left_DC
     pca.channels[motor_dict['RMotor']].duty_cycle = right_DC
-  output_dict = {'Left':left_DC,'Right':right_DC,'Diff':DIFF_PER}
+
+  if left_DC>0 and DIFF_PER==0:
+    controller=1
+    heading = get_mqtt_sensor().get('euler')[0]
+  else:
+    controller=0
+    heading=False
+
+  output_dict = {'Left':left_DC,'Right':right_DC, 'Controller':controller,'Heading':heading, 'Diff':DIFF_PER,'PID':PID_gains,'Forward':FORWARD_PER}
+  pickle_controller(output_dict);
+
   print(output_dict)
   return output_dict
+
+def pickle_controller(data):
+  with open('command.pickle','wb') as f:
+    data = pickle.dump(data,f)
 
 ### Functions to run the bot
 
@@ -105,11 +125,14 @@ def sensor():
   data=get_mqtt_sensor();
   return data
 
-@app.route('/throttle/<forward>/<differential>')
+@app.route('/throttle/<forward>/<differential>/<Kp>/<Ki>/<Kd>')
 #needs a throttle and diffential between 0 and 100
-def go_forward(forward,differential):
+def go_forward(forward,differential,Kp,Ki,Kd):
   forward = int(forward)
   differential=int(differential)
+  Kp=float(Kp)
+  Ki=float(Ki)
+  Kd=float(Kd)
   ##make sure they are in range, else kill the throttle
   if (forward not in range(101)):
     output = set_throttle(0,0)
@@ -118,7 +141,7 @@ def go_forward(forward,differential):
     output = set_throttle(0,0)
     return json.dumps(output.update({'error':'differential out of range'}))
   ## passed the test, now send to throttle
-  output = set_throttle(forward,differential)
+  output = set_throttle(forward,differential,[Kp,Ki,Kd])
   return json.dumps(output)
 
 

@@ -10,7 +10,7 @@ function ThrottleSliders({ throttle, setMaxThrottle, maxThrottle }) {
 
 	return (
 		<Box>
-			<Flex width="200px" justifyContent="space-between">
+			<Flex justifyContent="space-around">
 				<Box>
 					<Box
 						boxShadow="lg"
@@ -39,6 +39,7 @@ function ThrottleSliders({ throttle, setMaxThrottle, maxThrottle }) {
 
 			<Slider
 				aria-label="slider-ex-4"
+				width="80%"
 				value={maxThrottle.forward}
 				onChange={(val) => {
 					console.log('slider', val);
