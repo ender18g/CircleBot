@@ -6,6 +6,7 @@ import Arrow from './Arrow';
 import ThrottleSliders from './ThrottleSliders';
 import Video from './Video';
 import GainAdjust from './GainAdjust';
+import LineChart from './LineChart';
 
 function App() {
 	const [ sensorData, setSensorData ] = useState({
@@ -20,6 +21,7 @@ function App() {
 	const [ maxThrottle, setMaxThrottle ] = useState({ forward: 20, turn: 15 });
 	const [ showVideo, setShowVideo ] = useState(false);
 	const [ gains, setGains ] = useState({ Kp: 0, Ki: 0, Kd: 0 });
+	const [ showPlot, setShowPlot ] = useState(false);
 
 	const getData = () => {
 		axios.get('/sensor').then((res) => {
@@ -122,6 +124,15 @@ function App() {
 					<GainAdjust gains={gains} setGains={setGains} />
 				</Box>
 			</Flex>
+			<Button
+				onClick={() => {
+					setShowPlot(!showPlot);
+				}}
+				colorScheme="red"
+			>
+				Show Response Plot
+			</Button>
+			<Box p="3">{showPlot && <LineChart />}</Box>
 		</Box>
 	);
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
-from flask import Flask, Response
+from flask import Flask, Response,jsonify
 from math import floor
 from importlib import import_module
 import os
@@ -124,6 +124,12 @@ def index():
 def sensor():
   data=get_mqtt_sensor();
   return data
+
+@app.route('/history')
+def history():
+  with open('headings.pickle','rb') as f:
+    data = pickle.load(f)
+  return jsonify(data)
 
 @app.route('/throttle/<forward>/<differential>/<Kp>/<Ki>/<Kd>')
 #needs a throttle and diffential between 0 and 100

@@ -87,12 +87,17 @@ if running_pi:
 
 while True:
   ## load the controller data
-  command_req = load_pickle('command.pickle')
+  try:
+    command_req = load_pickle('command.pickle')
+  except:
+    continue
+
   print(command_req)
   ## if the controller is off, continue to next loop
   if not command_req or not command_req.get('Controller'):
     if heading_history:
     #clear and save previous headings
+      heading_history={'requested':heading_history[0],'history':heading_history}
       save_pickle(heading_history,'headings.pickle')
       ##initialize variables for next run
       heading_history=[]
@@ -107,7 +112,11 @@ while True:
     PID_gains=command_req.get('PID')
     forward_base_per = command_req.get('Forward')
   # get curr heading data
-  imu_data = load_pickle('sensor.pickle')
+  try:
+    imu_data = load_pickle('sensor.pickle')
+  except:
+    continue
+  
   if imu_data:
     cur_heading = imu_data.get('euler')[0]
     heading_history.append(cur_heading)
