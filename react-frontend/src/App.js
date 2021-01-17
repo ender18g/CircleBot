@@ -1,7 +1,7 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Box, Heading, Flex, Text, Button } from '@chakra-ui/react';
+import { Box, Heading, Flex, Text, Button, Input } from '@chakra-ui/react';
 import Arrow from './Arrow';
 import ThrottleSliders from './ThrottleSliders';
 import Video from './Video';
@@ -22,6 +22,7 @@ function App() {
 	const [ showVideo, setShowVideo ] = useState(false);
 	const [ gains, setGains ] = useState({ Kp: 0, Ki: 0, Kd: 0 });
 	const [ showPlot, setShowPlot ] = useState(false);
+	const [ refInterval, setRefInterval ] = useState(100);
 
 	const getData = () => {
 		axios.get('/sensor').then((res) => {
@@ -29,11 +30,20 @@ function App() {
 		});
 	};
 
-	useEffect(() => {
-		setInterval(() => {
-			getData();
-		}, 100);
-	}, []);
+	useEffect(
+		() => {
+			console.log('setting interval');
+			let intID = setInterval(() => {
+				getData();
+			}, parseInt(refInterval));
+
+			return () => {
+				console.log('clearing interval');
+				clearInterval(intID);
+			};
+		},
+		[ refInterval ]
+	);
 
 	useEffect(
 		() => {
@@ -56,11 +66,13 @@ function App() {
 	);
 
 	const handleKey = (e) => {
+		console.log(e);
 		setPressedkey(e.code);
 		switch (e.code) {
 			case 'KeyW':
 				console.log('max forward', maxThrottle);
 				setThrottleCommand({ turn: 0, forward: maxThrottle['forward'] });
+				setShowPlot(false);
 				break;
 			case 'KeyS':
 				//THIS SHOULD TURN IT OFFF
@@ -72,6 +84,9 @@ function App() {
 				break;
 			case 'KeyD':
 				setThrottleCommand({ ...throttleCommand, turn: maxThrottle['turn'] });
+				break;
+			case 'Space':
+				setShowPlot(!showPlot);
 				break;
 			default:
 				break;
@@ -113,7 +128,27 @@ function App() {
 				Show Video
 			</Button>
 			<Flex mt="10" justify="space-around" flexWrap="wrap" align="center">
-				<Arrow rotation={sensorData.euler[0]} />
+				<Box>
+					<Arrow rotation={sensorData.euler[0]} />
+					<Flex mt="8" justify="center" align="center">
+						<Text fontWeight="600" mr="3">
+							Refresh:
+						</Text>
+						<Input
+							mt="1"
+							w="75px"
+							value={refInterval}
+							onChange={(e) => {
+								const newInt = parseInt(e.target.value);
+								if (isNaN(newInt) || newInt < 10) {
+									setRefInterval(100);
+								} else {
+									setRefInterval(newInt);
+								}
+							}}
+						/>
+					</Flex>
+				</Box>
 				{showVideo && <Video />}
 				<Box width="200px" justify="center">
 					<ThrottleSliders

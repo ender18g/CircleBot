@@ -59,7 +59,7 @@ def apply_motor(forward_base_per,correction):
     left_DC=forward_DC
     right_DC=correction_DC
     
-  print(f"correction left:{left_DC} right:{right_DC}")
+  #print(f"correction left:{left_DC} right:{right_DC}")
   if running_pi:
     #if running on pi actually apply changes
     pca.channels[0].duty_cycle=left_DC
@@ -92,7 +92,7 @@ while True:
   except:
     continue
 
-  print(command_req)
+  #print(command_req)
   ## if the controller is off, continue to next loop
   if not command_req or not command_req.get('Controller'):
     if heading_history:
@@ -116,7 +116,7 @@ while True:
     imu_data = load_pickle('sensor.pickle')
   except:
     continue
-  
+
   if imu_data:
     cur_heading = imu_data.get('euler')[0]
     heading_history.append(cur_heading)
@@ -126,7 +126,7 @@ while True:
   heading_error=get_heading_error(req_heading,cur_heading)
   sum_error+=heading_error
 
-  print(f"Current: {cur_heading} | Requested: {req_heading} | Error: {heading_error}")
+  #print(f"Current: {cur_heading} | Requested: {req_heading} | Error: {heading_error}")
   correction = calculate_correction(heading_error,sum_error,PID_gains)
   apply_motor(forward_base_per,correction)
 
