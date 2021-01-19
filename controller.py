@@ -42,7 +42,7 @@ def calculate_correction(heading_error, sum_error,PID_gains):
   average_error = sum(error_history)
 
   p_component = Kp * heading_error
-  d_component = Kd* average_error
+  d_component = Kd* heading_error-prev_error
   i_component = Ki * sum_error
   #if error is positive, then we need more right throttle
   total_correction =-(p_component+d_component+i_component)

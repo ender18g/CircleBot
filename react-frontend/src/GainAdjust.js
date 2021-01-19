@@ -3,7 +3,7 @@ import { Box, Heading, Flex, Text, Slider, SliderTrack, SliderFilledTrack, Slide
 const gainTypes = [
 	{
 		name: 'Kp',
-		increment: 0.1
+		increment: 1
 	},
 	{
 		name: 'Ki',
@@ -11,7 +11,7 @@ const gainTypes = [
 	},
 	{
 		name: 'Kd',
-		increment: 0.1
+		increment: 1
 	}
 ];
 
