@@ -3,8 +3,7 @@ from time import sleep
 import os
 from math import floor
 
-CORRECTION_RATE = 20
-
+CORRECTION_RATE = 40
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -59,11 +58,11 @@ def apply_motor(forward_base_per,correction):
     left_DC=forward_DC
     right_DC=correction_DC
     
-  #print(f"correction left:{left_DC} right:{right_DC}")
+  print(f"correction left:{left_DC} right:{right_DC}")
   if running_pi:
     #if running on pi actually apply changes
-    pca.channels[0].duty_cycle=left_DC
-    pca.channels[1].duty_cycle=right_DC
+    pca.channels[0].duty_cycle=min(left_DC,0xFFFF)
+    pca.channels[1].duty_cycle=min(right_DC,0xFFFF)
 
 heading_history=[]
 sum_error=0
