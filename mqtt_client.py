@@ -27,7 +27,7 @@ def on_message(client, userdata, msg):
   byte_str = msg.payload
   data = ast.literal_eval(byte_str.decode("UTF-8"))
   #print(data)
-  print( f"{data['euler'][0]}", end='\r')
+  #print( f"{data['euler'][0]}", end='\r')
   save_pickle(data,pickle_file)
   try:  
     print( f"{data.get('euler')[0]}", end='\r')

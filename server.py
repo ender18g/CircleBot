@@ -4,6 +4,8 @@ from flask import Flask, Response,jsonify
 from math import floor
 from importlib import import_module
 import os
+from time import sleep
+
 
 
 import json
@@ -85,6 +87,9 @@ def set_throttle(FORWARD_PER,DIFF_PER,PID_gains):
       right_inv.off()
   #for a positive differential, L motor moves faster for a right turn
   if (running_pi):
+    pca.channels[motor_dict['LMotor']].duty_cycle = left_DC
+    pca.channels[motor_dict['RMotor']].duty_cycle = right_DC
+    sleep(.001)
     pca.channels[motor_dict['LMotor']].duty_cycle = left_DC
     pca.channels[motor_dict['RMotor']].duty_cycle = right_DC
 

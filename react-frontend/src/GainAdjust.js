@@ -1,8 +1,24 @@
 import { Box, Heading, Flex, Text, Slider, SliderTrack, SliderFilledTrack, SliderThumb, Input } from '@chakra-ui/react';
 
+const gainTypes = [
+	{
+		name: 'Kp',
+		increment: 0.1
+	},
+	{
+		name: 'Ki',
+		increment: 0.01
+	},
+	{
+		name: 'Kd',
+		increment: 0.1
+	}
+];
+
 function GainAdjust({ gains, setGains }) {
-	const handleGains = (e) => {
-		setGains({ ...gains, [e.target.name]: e.target.value });
+	const handleGains = (e, variable, value) => {
+		console.log(variable, value);
+		setGains({ ...gains, [variable]: Math.round((gains[variable] + value) * 100) / 100 });
 	};
 
 	return (
@@ -15,24 +31,39 @@ function GainAdjust({ gains, setGains }) {
 			justify="center"
 			align="center"
 		>
-			<Box m="1">
-				<Text mr="1" fontWeight="700">
-					Kp
-				</Text>
-				<Input name="Kp" value={gains.Kp} width="100px" onChange={handleGains} />
-			</Box>
-			<Box m="1">
-				<Text onChange={handleGains} mr="1" fontWeight="700">
-					Ki
-				</Text>
-				<Input name="Ki" value={gains.Ki} width="100px" onChange={handleGains} />
-			</Box>
-			<Box m="1">
-				<Text onChange={handleGains} mr="1" fontWeight="700">
-					Kd
-				</Text>
-				<Input name="Kd" value={gains.Kd} width="100px" onChange={handleGains} />
-			</Box>
+			{gainTypes.map((g) => (
+				<Box w="100%" m="1">
+					<Text fontSize="xl" mr="1" fontWeight="700">
+						{g.name}
+					</Text>
+					<Flex align="center" name={g.name} justify="space-around" w="100%">
+						<Text
+							m="2"
+							fontWeight="700"
+							fontSize="3xl"
+							onClick={(e) => {
+								handleGains(e, g.name, -g.increment);
+							}}
+						>
+							-
+						</Text>
+						<Text m="2" fontWeight="700" fontSize="xl" color={gains[g.name] > 0 ? 'teal.500' : 'red.500'}>
+							{gains[g.name]}
+						</Text>
+
+						<Text
+							m="2"
+							fontWeight="700"
+							fontSize="3xl"
+							onClick={(e) => {
+								handleGains(e, g.name, g.increment);
+							}}
+						>
+							+
+						</Text>
+					</Flex>
+				</Box>
+			))}
 		</Flex>
 	);
 }

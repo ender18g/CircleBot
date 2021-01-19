@@ -131,22 +131,54 @@ function App() {
 				<Box>
 					<Arrow rotation={sensorData.euler[0]} />
 					<Flex mt="8" justify="center" align="center">
-						<Text fontWeight="600" mr="3">
-							Refresh:
-						</Text>
-						<Input
-							mt="1"
-							w="75px"
-							value={refInterval}
-							onChange={(e) => {
-								const newInt = parseInt(e.target.value);
-								if (isNaN(newInt) || newInt < 10) {
-									setRefInterval(100);
-								} else {
-									setRefInterval(newInt);
-								}
-							}}
-						/>
+						<Box w="100%" m="1">
+							<Flex align="center" justify="space-around" w="100%">
+								<Text
+									m="2"
+									fontWeight="700"
+									fontSize="3xl"
+									onClick={(e) => {
+										if (refInterval > 20) {
+											setRefInterval(refInterval - 10);
+										}
+									}}
+								>
+									-
+								</Text>
+								<Text
+									m="2"
+									fontWeight="700"
+									fontSize="xl"
+									color={refInterval > 1000 ? 'red.500' : 'blue.500'}
+								>
+									{refInterval}ms
+								</Text>
+
+								<Text
+									m="2"
+									fontWeight="700"
+									fontSize="3xl"
+									onClick={(e) => {
+										setRefInterval(refInterval + 10);
+									}}
+								>
+									+
+								</Text>
+							</Flex>
+							<Text
+								fontWeight="700"
+								fontSize="md"
+								onClick={(e) => {
+									if (refInterval > 1000) {
+										setRefInterval(100);
+									} else {
+										setRefInterval(10000);
+									}
+								}}
+							>
+								Toggle Refresh
+							</Text>
+						</Box>
 					</Flex>
 				</Box>
 				{showVideo && <Video />}
