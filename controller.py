@@ -38,11 +38,11 @@ def get_heading_error(h1,h2):
 def calculate_correction(heading_error, sum_error,PID_gains):
   [Kp,Ki,Kd]=PID_gains
   error_history.pop(0)
-  error_history.append(heading_error);
+  error_history.append(heading_error-prev_error);
   average_error = sum(error_history)
 
   p_component = Kp * heading_error
-  d_component = Kd* heading_error-prev_error
+  d_component = Kd* average_error
   i_component = Ki * sum_error
   #if error is positive, then we need more right throttle
   total_correction =-(p_component+d_component+i_component)
@@ -106,6 +106,7 @@ while True:
       save_pickle(heading_history,'headings.pickle')
       ##initialize variables for next run
       heading_history=[]
+      error_history = [0,0,0,0,0];
       sum_error=0
       prev_error=0
       print('Heading list saved')
