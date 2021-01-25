@@ -7,7 +7,7 @@ from base_camera import BaseCamera
 class Camera(BaseCamera):
     @staticmethod
     def frames():
-        with picamera.PiCamera() as camera:
+        with picamera.PiCamera(resolution=(640,480),framrate=10) as camera:
             # let camera warm up
             time.sleep(2)
 
